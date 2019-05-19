@@ -1,0 +1,10 @@
+/Core/
+/Drivers/
+/FATFS/
+/Middlewares/
+/Startup/
+/USB_DEVICE/
+/makefile
+/objects.list
+/objects.mk
+/sources.mk

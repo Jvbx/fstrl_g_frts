@@ -1,0 +1,117 @@
+#include "main.h"
+#include "spi_utils.h"
+
+#define SPIx_WAIT_BUSY(SPIx, RETR_CNT)         if (wait_spi_busy(SPIx, RETR_CNT) != SPIx_OK) { spi_stop(SPIx); return SPIx_TIMEOUT;}
+#define SPIx_WAIT_TX_EMPTY(SPIx, RETR_CNT)     if (spi_wait_tx_empty(SPIx, RETR_CNT) != SPIx_OK) { spi_stop(SPIx); return SPIx_TIMEOUT;}
+#define SPIx_WAIT_RX_NOT_EMPTY(SPIx, RETR_CNT) if (spi_wait_rx_not_empty(SPIx, RETR_CNT) != SPIx_OK) { spi_stop(SPIx); return SPIx_TIMEOUT;}
+
+
+
+__STATIC_INLINE SPIx_RESULT spi_wait_tx_empty(spix_config* spi_x_cfg, uint16_t retry_count) {
+
+        while (LL_SPI_IsActiveFlag_TXE(spi_x_cfg->spi) == 0)  {
+            if ((retry_count--) == 0) return SPIx_TIMEOUT;
+        }
+        return SPIx_OK;
+}
+
+__STATIC_INLINE SPIx_RESULT spi_wait_rx_not_empty(spix_config* spi_x_cfg, uint16_t retry_count) {
+
+        while (LL_SPI_IsActiveFlag_RXNE(spi_x_cfg->spi) == 0)  {
+            if ((retry_count--) == 0) return SPIx_TIMEOUT;
+        }
+        return SPIx_OK;
+}
+
+__STATIC_INLINE SPIx_RESULT wait_spi_busy(spix_config* spi_x_cfg, uint16_t retry_count) {
+
+    while (LL_SPI_IsActiveFlag_BSY(spi_x_cfg->spi) > 0)  {
+            if ((retry_count--) == 0) return SPIx_TIMEOUT;
+          }
+        return SPIx_OK;
+}
+
+
+
+
+
+ SPIx_RESULT spi_recieve(spix_config* spi_x_cfg,           // device handler
+                             uint8_t *rtxbuf,        // pointer to the first byte of the r/w buffer. buffer should be big enough to contain all transmitted data. recieved data writes back into this buffer
+                             uint16_t bytecount,     // total count of bytes to transmit, including command opcode, dummy bytes etc
+                             uint16_t retry_cnt)   // time to wait for flags.
+  {
+     spi_start(spi_x_cfg);
+
+      for (uint16_t curr_byte_number = 0; curr_byte_number < bytecount; curr_byte_number++)
+         {
+
+            SPIx_WAIT_TX_EMPTY(spi_x_cfg, retry_cnt);
+
+            LL_SPI_TransmitData8(spi_x_cfg->spi, 0xFF);
+
+            SPIx_WAIT_RX_NOT_EMPTY(spi_x_cfg, retry_cnt);
+
+            rtxbuf[curr_byte_number] = LL_SPI_ReceiveData8(spi_x_cfg->spi);
+        }
+
+       SPIx_WAIT_TX_EMPTY(spi_x_cfg, retry_cnt);
+       SPIx_WAIT_BUSY(spi_x_cfg, retry_cnt);
+       spi_stop(spi_x_cfg);
+      return SPIx_OK;
+  }
+
+ SPIx_RESULT spi_transmit(spix_config* spi_x_cfg,           // device handler
+                        const uint8_t * rtxbuf,        // pointer to the first byte of the r/w buffer. buffer should be big enough to contain all transmitted data. recieved data writes back into this buffer
+                               uint16_t bytecount,     // total count of bytes to transmit, including command opcode, dummy bytes etc
+                               uint16_t retry_cnt)    // time to wait for flags.
+  {   uint8_t tmp = 0;
+
+      spi_start(spi_x_cfg);
+
+      for (uint16_t curr_byte_number = 0; curr_byte_number < bytecount; curr_byte_number++)
+         {
+
+            SPIx_WAIT_TX_EMPTY(spi_x_cfg, retry_cnt);
+
+            LL_SPI_TransmitData8(spi_x_cfg->spi, rtxbuf[curr_byte_number]);
+
+            SPIx_WAIT_RX_NOT_EMPTY(spi_x_cfg, retry_cnt);
+            tmp = LL_SPI_ReceiveData8(spi_x_cfg->spi);
+        }
+
+      SPIx_WAIT_TX_EMPTY(spi_x_cfg, retry_cnt);
+      SPIx_WAIT_BUSY(spi_x_cfg, retry_cnt);
+      spi_stop(spi_x_cfg);
+      return SPIx_OK;
+  }
+
+
+ SPIx_RESULT spi_recieve_transmit(spix_config* spi_x_cfg,           // device handler
+                                      uint8_t * rtxbuf,        // pointer to the first byte of the r/w buffer. buffer should be big enough to contain all transmitted data. recieved data writes back into this buffer
+                                       uint16_t bytecount,     // total count of bytes to transmit, including command opcode, dummy bytes etc
+                                       uint16_t retry_cnt)    // time to wait for flags.
+  {
+      spi_start(spi_x_cfg);
+
+      for (uint16_t curr_byte_number = 0; curr_byte_number < bytecount; curr_byte_number++)
+         {
+
+            SPIx_WAIT_TX_EMPTY(spi_x_cfg, retry_cnt);
+
+            LL_SPI_TransmitData8(spi_x_cfg->spi, rtxbuf[curr_byte_number]);
+
+            SPIx_WAIT_RX_NOT_EMPTY(spi_x_cfg, retry_cnt);
+
+            rtxbuf[curr_byte_number] = LL_SPI_ReceiveData8(spi_x_cfg->spi);
+        }
+
+      SPIx_WAIT_TX_EMPTY(spi_x_cfg, retry_cnt);
+      SPIx_WAIT_BUSY(spi_x_cfg, retry_cnt);
+      spi_stop(spi_x_cfg);
+      return SPIx_OK;
+  }
+
+
+
+
+

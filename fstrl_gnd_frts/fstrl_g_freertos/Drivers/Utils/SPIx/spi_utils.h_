@@ -1,0 +1,77 @@
+
+#ifndef _SPI_UTILS_h
+#define _SPI_UTILS_h
+
+
+
+
+#include "main.h"
+
+
+
+
+typedef enum { SPIx_OK               = (int8_t) 0x00,
+               SPIx_READY            = (int8_t) 0x01,
+               SPIx_ERROR            = (int8_t) 0x80,
+               SPIx_INVALID_ARGUMENT = (int8_t) 0x81,
+               SPIx_BUSY             = (int8_t) 0x90,
+               SPIx_TIMEOUT          = (int8_t) 0xA0,
+
+             } SPIx_RESULT;
+
+
+
+typedef struct {
+                SPI_TypeDef * spi;           //hardware spi module, flash chip is connected to
+                gpio_line     csn_line;      //CS#, software driven chip select line, active low
+                uint32_t      spi_retry;     //attempts to retry, wait, etc
+               } spix_config;
+
+__STATIC_INLINE void spi_csn_set(spix_config* spi_x_cfg) {
+   gpio_line_set(&spi_x_cfg->csn_line);
+}
+
+__STATIC_INLINE void spi_csn_reset(spix_config* spi_x_cfg) {
+   gpio_line_reset(&spi_x_cfg->csn_line);
+}
+
+__STATIC_INLINE void spi_enable(spix_config* spi_x_cfg) {
+if (!LL_SPI_IsEnabled(spi_x_cfg->spi))
+{LL_SPI_Enable(spi_x_cfg->spi);}
+}
+
+__STATIC_INLINE void spi_disable(spix_config* spi_x_cfg) {
+if (LL_SPI_IsEnabled(spi_x_cfg->spi))
+{LL_SPI_Disable(spi_x_cfg->spi);}
+}
+
+
+__STATIC_INLINE void spi_start(spix_config* spi_x_cfg){
+   spi_enable(spi_x_cfg);
+   spi_csn_reset(spi_x_cfg);
+}
+
+
+__STATIC_INLINE void spi_stop(spix_config* spi_x_cfg){
+spi_csn_set(spi_x_cfg);
+spi_disable(spi_x_cfg);
+}
+
+
+ SPIx_RESULT spi_recieve(spix_config* spi_x_cfg,           // device handler
+                             uint8_t *rtxbuf,        // pointer to the first byte of the r/w buffer. buffer should be big enough to contain all transmitted data. recieved data writes back into this buffer
+                             uint16_t bytecount,     // total count of bytes to transmit, including command opcode, dummy bytes etc
+                             uint16_t retry_cnt);   // time to wait for flags.
+
+
+ SPIx_RESULT spi_transmit(spix_config* spi_x_cfg,           // device handler
+                        const uint8_t * rtxbuf,        // pointer to the first byte of the r/w buffer. buffer should be big enough to contain all transmitted data. recieved data writes back into this buffer
+                               uint16_t bytecount,     // total count of bytes to transmit, including command opcode, dummy bytes etc
+                               uint16_t retry_cnt);    // time to wait for flags.
+
+
+ SPIx_RESULT spi_recieve_transmit(spix_config* spi_x_cfg,           // device handler
+                                      uint8_t * rtxbuf,        // pointer to the first byte of the r/w buffer. buffer should be big enough to contain all transmitted data. recieved data writes back into this buffer
+                                       uint16_t bytecount,     // total count of bytes to transmit, including command opcode, dummy bytes etc
+                                       uint16_t retry_cnt);    // time to wait for flags.
+#endif /* _SPI_UTILS_h */
