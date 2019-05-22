@@ -141,6 +141,17 @@ void Error_Handler(void);
 #define            ON   1
 #define            OFF  0
 
+
+#define  BIT7           (1 << 7)
+#define  BIT6           (1 << 6)
+#define  BIT5           (1 << 5)
+#define  BIT4           (1 << 4)
+#define  BIT3           (1 << 3)
+#define  BIT2           (1 << 2)
+#define  BIT1           (1 << 1)
+#define  BIT0           (1 << 0)
+
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -7,7 +7,7 @@
 //
 
 #include "LCD_1602A.h"
-#include "timerdelay.h"
+//#include "timerdelay.h"
 #include "dwt_stm32_delay.h"
 
 //#define VALID_PORT(port) (port >= 0 && port <= 13)
@@ -214,7 +214,7 @@ void LCD1602A_CursorSeekMode(uint8_t entire_display_seek, uint8_t seek_right)
 
 void LCD1602A_FunctionSet(uint8_t display_8bit, uint8_t two_lines, uint8_t bigfont)
 {
-	uint8_t lcd_cmd = (LCD_FUNCTION_SET|(display_8bit << LCD_8_BIT_MODE)|(two_lines << LCD_2_LINES)|(bigfont << LCD_FONT_SIZE_BIG));
+	uint8_t lcd_cmd = (LCD_FUNCTION_SET|(display_8bit << LCD_BIT_MODE)|(two_lines << LCD_2_LINES)|(bigfont << LCD_FONT_SIZE_BIG));
     LCD1602A_SendCmd(lcd_cmd);
 }
 
@@ -224,9 +224,9 @@ void LCD1602A_CGRAM_Set(uint8_t cgram_address)
     LCD1602A_SendCmd(lcd_cmd);
 }
 
-void LCD1602A_DDRAM_Set(uint8_t cgram_address)
+void LCD1602A_DDRAM_Set(uint8_t ddram_address)
 {
-	uint8_t lcd_cmd = (LCD_SET_DDRAM_ADDR|(cgram_address & LCD_DDRAM_MASK));
+	uint8_t lcd_cmd = (LCD_SET_DDRAM_ADDR|(ddram_address & LCD_DDRAM_MASK));
     LCD1602A_SendCmd(lcd_cmd);
 }
 

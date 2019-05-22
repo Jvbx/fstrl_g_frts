@@ -13,8 +13,7 @@
 #include "LCD_1602A.h"
 
 
-extern osSemaphoreId sm_LCD_Bus_readyHandle;
-extern osStaticSemaphoreDef_t sm_LCD_Bus_readyControlBlock;
+extern osMutexId mt_LCD_freeHandle;
 
 /* Header_Start_tsk_LEDx_blink */
 /**
@@ -33,37 +32,37 @@ uint8_t *arg = (uint8_t*)argument;
   {
       if (arg == 0)
           {
-          if(osSemaphoreWait(sm_LCD_Bus_readyHandle , 0) == osOK) {
+          if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
           LCD1602A_ClearScreen(); //Очистка дисплея от мусора
           LCD1602A_SetCursorPos(0, 1); //Установка курсора
           LCD1602A_PrintStr("LED1Task_enter" + '\0');
-          } osSemaphoreRelease(sm_LCD_Bus_readyHandle);
+          } osSemaphoreRelease(mt_LCD_freeHandle);
           //uint8_t flag1 = 1;
           LED1_TOGGLE();
           //flag1 = 0;
           osDelay(100);
-          if(osSemaphoreWait(sm_LCD_Bus_readyHandle , 0) == osOK) {
+          if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
           LCD1602A_ClearScreen(); //Очистка дисплея от мусора
           LCD1602A_SetCursorPos(0, 1); //Установка курсора
           LCD1602A_PrintStr("LED1Task_exit" + '\0');
-          } osSemaphoreRelease(sm_LCD_Bus_readyHandle);
+          } osSemaphoreRelease(mt_LCD_freeHandle);
           //taskYIELD();
           } else
                 {
-              if(osSemaphoreWait(sm_LCD_Bus_readyHandle, 0) == osOK) {
+              if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
                                LCD1602A_ClearScreen(); //Очистка дисплея от мусора
                                LCD1602A_SetCursorPos(1, 1); //Установка курсора
                                LCD1602A_PrintStr("LED2Task_enter" + '\0');
-                               } osSemaphoreRelease(sm_LCD_Bus_readyHandle);
+                               } osSemaphoreRelease(mt_LCD_freeHandle);
                  //uint8_t flag2 = 1;
                  LED2_TOGGLE();
                  //flag2 = 0;
                  osDelay(230);
-                 if(osSemaphoreWait(sm_LCD_Bus_readyHandle, 0) == osOK) {
+                 if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
                  LCD1602A_ClearScreen(); //Очистка дисплея от мусора
                  LCD1602A_SetCursorPos(1, 1); //Установка курсора
                  LCD1602A_PrintStr("LED2Task_exit" + '\0');
-                 } osSemaphoreRelease(sm_LCD_Bus_readyHandle);
+                 } osSemaphoreRelease(mt_LCD_freeHandle);
                 // taskYIELD();
                 }
   }

@@ -89,8 +89,6 @@ extern void Start_tsk_LEDx_blink(const void * argument);
 extern void StartDefaultTask(const void * argument);
 void tmTestTimer_clbck(const void * argument);
 
-extern void MX_USB_DEVICE_Init(void);
-extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* GetIdleTaskMemory prototype (linked to static allocation support) */

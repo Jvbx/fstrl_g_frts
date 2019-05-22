@@ -27,29 +27,29 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000029  00000000  00000000  00020188  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00067373  00000000  00000000  000201b1  2**0
+ 12 .debug_info   000671bd  00000000  00000000  000201b1  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_abbrev 0000b915  00000000  00000000  00087524  2**0
+ 13 .debug_abbrev 0000b8fb  00000000  00000000  0008736e  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_loc    000211d5  00000000  00000000  00092e39  2**0
+ 14 .debug_loc    000211d5  00000000  00000000  00092c69  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_aranges 00002528  00000000  00000000  000b4010  2**3
+ 15 .debug_aranges 00002528  00000000  00000000  000b3e40  2**3
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_ranges 00002ec0  00000000  00000000  000b6538  2**3
+ 16 .debug_ranges 00002ec0  00000000  00000000  000b6368  2**3
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_macro  000299a5  00000000  00000000  000b93f8  2**0
+ 17 .debug_macro  00029994  00000000  00000000  000b9228  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_line   00035818  00000000  00000000  000e2d9d  2**0
+ 18 .debug_line   000357ff  00000000  00000000  000e2bbc  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_str    000a2e52  00000000  00000000  001185b5  2**0
+ 19 .debug_str    000a2e5e  00000000  00000000  001183bb  2**0
                   CONTENTS, READONLY, DEBUGGING
- 20 .comment      0000007b  00000000  00000000  001bb407  2**0
+ 20 .comment      0000007b  00000000  00000000  001bb219  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  000072ac  00000000  00000000  001bb484  2**2
+ 21 .debug_frame  000072ac  00000000  00000000  001bb294  2**2
                   CONTENTS, READONLY, DEBUGGING
- 22 .stab         000000cc  00000000  00000000  001c2730  2**2
+ 22 .stab         000000cc  00000000  00000000  001c2540  2**2
                   CONTENTS, READONLY, DEBUGGING
- 23 .stabstr      000001b9  00000000  00000000  001c27fc  2**0
+ 23 .stabstr      000001b9  00000000  00000000  001c260c  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -364,7 +364,7 @@ void Start_tsk_LEDx_blink(const void * argument)
   {
       if (arg == 0)
           {
-          if(osSemaphoreWait(sm_LCD_Bus_readyHandle , 0) == osOK) {
+          if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
  80003fe:	2100      	movs	r1, #0
  8000400:	4b30      	ldr	r3, [pc, #192]	; (80004c4 <Start_tsk_LEDx_blink+0xcc>)
  8000402:	6818      	ldr	r0, [r3, #0]
@@ -373,7 +373,7 @@ void Start_tsk_LEDx_blink(const void * argument)
           LCD1602A_ClearScreen(); //Очистка дисплея от мусора
           LCD1602A_SetCursorPos(0, 1); //Установка курсора
           LCD1602A_PrintStr("LED1Task_enter" + '\0');
-          } osSemaphoreRelease(sm_LCD_Bus_readyHandle);
+          } osSemaphoreRelease(mt_LCD_freeHandle);
  800040a:	4c2e      	ldr	r4, [pc, #184]	; (80004c4 <Start_tsk_LEDx_blink+0xcc>)
  800040c:	6820      	ldr	r0, [r4, #0]
  800040e:	f007 ff2d 	bl	800826c <osSemaphoreRelease>
@@ -393,7 +393,7 @@ __STATIC_INLINE void LL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint32_t PinMask)
           osDelay(100);
  800041c:	2064      	movs	r0, #100	; 0x64
  800041e:	f007 fe88 	bl	8008132 <osDelay>
-          if(osSemaphoreWait(sm_LCD_Bus_readyHandle , 0) == osOK) {
+          if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
  8000422:	2100      	movs	r1, #0
  8000424:	6820      	ldr	r0, [r4, #0]
  8000426:	f007 fee7 	bl	80081f8 <osSemaphoreWait>
@@ -401,7 +401,7 @@ __STATIC_INLINE void LL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint32_t PinMask)
           LCD1602A_ClearScreen(); //Очистка дисплея от мусора
           LCD1602A_SetCursorPos(0, 1); //Установка курсора
           LCD1602A_PrintStr("LED1Task_exit" + '\0');
-          } osSemaphoreRelease(sm_LCD_Bus_readyHandle);
+          } osSemaphoreRelease(mt_LCD_freeHandle);
  800042c:	4b25      	ldr	r3, [pc, #148]	; (80004c4 <Start_tsk_LEDx_blink+0xcc>)
  800042e:	6818      	ldr	r0, [r3, #0]
  8000430:	f007 ff1c 	bl	800826c <osSemaphoreRelease>
@@ -429,7 +429,7 @@ __STATIC_INLINE void LL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint32_t PinMask)
           //taskYIELD();
           } else
                 {
-              if(osSemaphoreWait(sm_LCD_Bus_readyHandle, 0) == osOK) {
+              if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
                                LCD1602A_ClearScreen(); //Очистка дисплея от мусора
  800045e:	f001 ff62 	bl	8002326 <LCD1602A_ClearScreen>
                                LCD1602A_SetCursorPos(1, 1); //Установка курсора
@@ -441,25 +441,25 @@ __STATIC_INLINE void LL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint32_t PinMask)
  800046c:	f002 f874 	bl	8002558 <LCD1602A_PrintStr>
  8000470:	e00c      	b.n	800048c <Start_tsk_LEDx_blink+0x94>
                  osDelay(230);
-                 if(osSemaphoreWait(sm_LCD_Bus_readyHandle, 0) == osOK) {
+                 if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
                  LCD1602A_ClearScreen(); //Очистка дисплея от мусора
                  LCD1602A_SetCursorPos(1, 1); //Установка курсора
                  LCD1602A_PrintStr("LED2Task_exit" + '\0');
-                 } osSemaphoreRelease(sm_LCD_Bus_readyHandle);
+                 } osSemaphoreRelease(mt_LCD_freeHandle);
  8000472:	4b14      	ldr	r3, [pc, #80]	; (80004c4 <Start_tsk_LEDx_blink+0xcc>)
  8000474:	6818      	ldr	r0, [r3, #0]
  8000476:	f007 fef9 	bl	800826c <osSemaphoreRelease>
       if (arg == 0)
  800047a:	2d00      	cmp	r5, #0
  800047c:	d0bf      	beq.n	80003fe <Start_tsk_LEDx_blink+0x6>
-              if(osSemaphoreWait(sm_LCD_Bus_readyHandle, 0) == osOK) {
+              if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
  800047e:	2100      	movs	r1, #0
  8000480:	4b10      	ldr	r3, [pc, #64]	; (80004c4 <Start_tsk_LEDx_blink+0xcc>)
  8000482:	6818      	ldr	r0, [r3, #0]
  8000484:	f007 feb8 	bl	80081f8 <osSemaphoreWait>
  8000488:	2800      	cmp	r0, #0
  800048a:	d0e8      	beq.n	800045e <Start_tsk_LEDx_blink+0x66>
-                               } osSemaphoreRelease(sm_LCD_Bus_readyHandle);
+                               } osSemaphoreRelease(mt_LCD_freeHandle);
  800048c:	4c0d      	ldr	r4, [pc, #52]	; (80004c4 <Start_tsk_LEDx_blink+0xcc>)
  800048e:	6820      	ldr	r0, [r4, #0]
  8000490:	f007 feec 	bl	800826c <osSemaphoreRelease>
@@ -470,7 +470,7 @@ __STATIC_INLINE void LL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint32_t PinMask)
                  osDelay(230);
  800049e:	20e6      	movs	r0, #230	; 0xe6
  80004a0:	f007 fe47 	bl	8008132 <osDelay>
-                 if(osSemaphoreWait(sm_LCD_Bus_readyHandle, 0) == osOK) {
+                 if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
  80004a4:	2100      	movs	r1, #0
  80004a6:	6820      	ldr	r0, [r4, #0]
  80004a8:	f007 fea6 	bl	80081f8 <osSemaphoreWait>
@@ -486,7 +486,7 @@ __STATIC_INLINE void LL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint32_t PinMask)
  80004bc:	4806      	ldr	r0, [pc, #24]	; (80004d8 <Start_tsk_LEDx_blink+0xe0>)
  80004be:	f002 f84b 	bl	8002558 <LCD1602A_PrintStr>
  80004c2:	e7d6      	b.n	8000472 <Start_tsk_LEDx_blink+0x7a>
- 80004c4:	20003ecc 	.word	0x20003ecc
+ 80004c4:	20005690 	.word	0x20005690
  80004c8:	40010c00 	.word	0x40010c00
  80004cc:	0800eec8 	.word	0x0800eec8
  80004d0:	0800eed8 	.word	0x0800eed8
@@ -1620,7 +1620,7 @@ __STATIC_INLINE uint32_t LL_RCC_HSE_IsReady(void)
   return (READ_BIT(RCC->CR, RCC_CR_HSERDY) == (RCC_CR_HSERDY));
  8000c7e:	4b34      	ldr	r3, [pc, #208]	; (8000d50 <SystemClock_Config+0xf0>)
  8000c80:	681b      	ldr	r3, [r3, #0]
-    Error_Handler();  
+    Error_Handler();
   }
   LL_RCC_HSE_Enable();
 
@@ -1743,7 +1743,7 @@ __STATIC_INLINE void LL_RCC_PLL_ConfigDomain_SYS(uint32_t Source, uint32_t PLLMu
  8000d24:	2b08      	cmp	r3, #8
  8000d26:	d1f9      	bne.n	8000d1c <SystemClock_Config+0xbc>
   {
-  
+
   }
   LL_Init1msTick(72000000);
  8000d28:	4c0b      	ldr	r4, [pc, #44]	; (8000d58 <SystemClock_Config+0xf8>)
@@ -1852,7 +1852,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
  8000db8:	4770      	bx	lr
 
 08000dba <assert_failed>:
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
@@ -5444,7 +5444,7 @@ void LCD1602A_DisplayControl(uint8_t display_state, uint8_t cursor_show, uint8_t
 void LCD1602A_FunctionSet(uint8_t display_8bit, uint8_t two_lines, uint8_t bigfont)
 {
  8002382:	b508      	push	{r3, lr}
-	uint8_t lcd_cmd = (LCD_FUNCTION_SET|(display_8bit << LCD_8_BIT_MODE)|(two_lines << LCD_2_LINES)|(bigfont << LCD_FONT_SIZE_BIG));
+	uint8_t lcd_cmd = (LCD_FUNCTION_SET|(display_8bit << LCD_BIT_MODE)|(two_lines << LCD_2_LINES)|(bigfont << LCD_FONT_SIZE_BIG));
  8002384:	0100      	lsls	r0, r0, #4
  8002386:	f040 0020 	orr.w	r0, r0, #32
  800238a:	b240      	sxtb	r0, r0
@@ -5464,14 +5464,14 @@ void LCD1602A_FunctionSet(uint8_t display_8bit, uint8_t two_lines, uint8_t bigfo
     LCD1602A_SendCmd(lcd_cmd);
 }
 
-void LCD1602A_DDRAM_Set(uint8_t cgram_address)
+void LCD1602A_DDRAM_Set(uint8_t ddram_address)
 {
  80023a2:	b508      	push	{r3, lr}
 	LCD1602A_SendByte(cmdbyte, CMD);
  80023a4:	2100      	movs	r1, #0
  80023a6:	f040 0080 	orr.w	r0, r0, #128	; 0x80
  80023aa:	f7ff ff09 	bl	80021c0 <LCD1602A_SendByte>
-	uint8_t lcd_cmd = (LCD_SET_DDRAM_ADDR|(cgram_address & LCD_DDRAM_MASK));
+	uint8_t lcd_cmd = (LCD_SET_DDRAM_ADDR|(ddram_address & LCD_DDRAM_MASK));
     LCD1602A_SendCmd(lcd_cmd);
 }
  80023ae:	bd08      	pop	{r3, pc}

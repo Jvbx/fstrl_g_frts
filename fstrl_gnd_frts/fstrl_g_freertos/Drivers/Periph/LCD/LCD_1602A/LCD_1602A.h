@@ -60,49 +60,49 @@
 //LCD160A Instructions:
 
 //Single instructions
-#define LCD_CLEAR_DISPLAY                     0x01    //0000 0001
-#define LCD_RETURN_HOME                       0x02    //0000 001x
+#define LCD_CLEAR_DISPLAY                     0x01     // 0000 0001
+#define LCD_RETURN_HOME                       0x02     // 0000 001x
 
 //Multiple option instructions:
 
 //Entry mode set bitmask:
-#define LCD_ENTRY_MODE_SET                    0x04    //0000 0100, base command mask
-#define LCD_SHIFT_RIGHT                       1        //0000 0010, H - move right, otherwise (L) - left
-#define LCD_SHIFT_DISPLAY                     0       //0000 0001, H - shift display, otherwise (L) - shift cursor
+#define LCD_ENTRY_MODE_SET                    0x04     // 0000 0100, base command mask
+#define LCD_SHIFT_RIGHT                       1        // 0000 0010, H - move right, otherwise (L) - left
+#define LCD_SHIFT_DISPLAY                     0        // 0000 0001, H - shift display, otherwise (L) - shift cursor
 
 //Display and Cursor ON/OFF
-#define LCD_DISPLAY_CONTROL                   0x08    //0000 1000, base command mask
-#define LCD_DISPLAY_ON                        2        //0000 0100, H - entire display on, L - display off
-#define LCD_CURSOR_SHOW                       1        //0000 0010, H - cursor shown, L - hidden
-#define LCD_CURSOR_BLINK                      0         //0000 0001, H - blinking on, L - blinking off
+#define LCD_DISPLAY_CONTROL                   0x08     // 0000 1000, base command mask
+#define LCD_DISPLAY_ON                        2        // 0000 0100, H - entire display on, L - display off
+#define LCD_CURSOR_SHOW                       1        // 0000 0010, H - cursor shown, L - hidden
+#define LCD_CURSOR_BLINK                      0        // 0000 0001, H - blinking on, L - blinking off
 
 //Cursor or Display shift
-#define LCD_DISPLAY_CURSOR_SEEK               0x10     //0001 0000, shift entire display/cursor without writing/reading data
-#define LCD_DISPLAY_SEEK                      3        //0000 1000, H - shift display, address counter not changed,
+#define LCD_DISPLAY_CURSOR_SEEK               0x10     // 0001 0000, shift entire display/cursor without writing/reading data
+#define LCD_DISPLAY_SEEK                      3        // 0000 1000, H - shift display, address counter not changed,
                                                        // L - move cursor, AC incremented or decremented
-#define LCD_SEEK_DIRECTION                    2        //0000 01xx, H - move right
+#define LCD_SEEK_DIRECTION                    2        // 0000 01xx, H - move right
 
 //Function Set
-#define LCD_FUNCTION_SET                      0x20    // 0010 0000, 4 or 8 bit mode, 1/2 lines, font size control
-#define LCD_8_BIT_MODE                        4        // 0001 0000, H - 8 bit mode, L - 4 bit mode
+#define LCD_FUNCTION_SET                      0x20     // 0010 0000, 4 or 8 bit mode, 1/2 lines, font size control
+#define LCD_BIT_MODE                          4        // 0001 0000, H - 8 bit mode, L - 4 bit mode
 #define LCD_2_LINES                           3        // 0000 1000, H - 2 line mode, L - 1 line
 #define LCD_FONT_SIZE_BIG                     2        // 0000 0100, H - 5x11 character size, L - 5x8 size
 
 //Set CGRAM adress
-#define LCD_SET_SGRAM_ADDR                    0x40    // 0100 0000
-#define LCD_SGRAM_MASK                        0x3F    // 0011 1111 - AND mask for cgram address
+#define LCD_SET_SGRAM_ADDR                    0x40     // 0100 0000
+#define LCD_SGRAM_MASK                        0x3F     // 0011 1111 - AND mask for cgram address
 
 //Set DDRAM adress
-#define LCD_SET_DDRAM_ADDR                    0x80    // 1000 0000
-#define LCD_DDRAM_MASK                        0x7F    // 0111 1111 - AND mask for ddram address
+#define LCD_SET_DDRAM_ADDR                    0x80     // 1000 0000
+#define LCD_DDRAM_MASK                        0x7F     // 0111 1111 - AND mask for ddram address
 
 //busy flag mask (read operation)
-#define LCD_BUSY_FLAG                         0x80    // 1000 0000 - busy flag, H - busy.  other bits contains current AC
+#define LCD_BUSY_FLAG                         0x80     // 1000 0000 - busy flag, H - busy.  other bits contains current AC
 
 //init sequence
-#define LCD_INIT_STAGE_0                      0x03    //0000 0011
-#define LCD_INIT_4_BIT                        0x02    //0000 0010
-#define LCD_INIT_4_STAGE_2                    0xC0    //0011 0010
+#define LCD_INIT_STAGE_0                      0x03     // 0000 0011
+#define LCD_INIT_4_BIT                        0x02     // 0000 0010
+#define LCD_INIT_4_STAGE_2                    0xC0     // 0011 0010
 #define LCD_INIT_STAGE_3                      (LCD_FUNCTION_SET|LCD_2_LINES|LCD_FONT_SIZE_BIG)    //0010 1100
 
 void LCD1602A_Init();

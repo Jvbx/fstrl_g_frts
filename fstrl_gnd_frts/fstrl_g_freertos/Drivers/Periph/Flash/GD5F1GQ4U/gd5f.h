@@ -10,15 +10,6 @@
 #include "main.h"
 #include "spi.h"
 
-#define  BIT7           (1 << 7)
-#define  BIT6           (1 << 6)
-#define  BIT5           (1 << 5)
-#define  BIT4           (1 << 4)
-#define  BIT3           (1 << 3)
-#define  BIT2           (1 << 2)
-#define  BIT1           (1 << 1)
-#define  BIT0           (1 << 0)
-
 #define BYTE_0_MASK32   (0x000000FF)
 #define BYTE_1_MASK32   (0x0000FF00)
 #define BYTE_2_MASK32   (0x00FF0000)
@@ -176,10 +167,10 @@ typedef enum { GD5F_OK               = (int8_t) 0x00,
 
 
 typedef struct {
-    SPI_TypeDef *    spi;           //hardware spi module, flash chip is connected to
-        uint32_t     spi_retry_count;   //not used with STM32 LL library
+    SPI_TypeDef *    spi;               //hardware spi module, flash chip is connected to
+        uint32_t     spi_retry_count;   //used with STM32 HAL and LL library.
 
-    GPIO_TypeDef*    csn_port;      //CS#, software driven chip select line, active low
+    GPIO_TypeDef*    csn_port;          //CS#, software driven chip select line, active low
         uint32_t     csn_pin;
 
 #ifdef  GD5F_USE_WP
