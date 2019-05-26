@@ -20,21 +20,24 @@
 extern gd5f       spi_nand_gd5f;
 
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_vReset_Perifery_Device */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the tsk_PERIF_Reset thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(const void * argument)
+/* USER CODE END Header_vReset_Perifery_Device */
+void vReset_Perifery_Device(const void * argument)
 {
   osThreadSuspendAll();
-/* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
 
   /* init code for FATFS */
   MX_FATFS_Init();
+
+  /* init code for USB_DEVICE */
+  MX_USB_DEVICE_Init();
+  USB_PIN_CONNECT()
+
 
   /* USER CODE BEGIN StartDefaultTask */
   //инициализация функции микросекунных задержек

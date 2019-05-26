@@ -65,12 +65,15 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-#define LED1_ON() LL_GPIO_SetOutputPin(LED1_GPIO_Port, LED1_Pin);
-#define LED1_OFF() LL_GPIO_ResetOutputPin(LED1_GPIO_Port, LED1_Pin);
+#define LED1_ON()     LL_GPIO_SetOutputPin(LED1_GPIO_Port, LED1_Pin);
+#define LED1_OFF()    LL_GPIO_ResetOutputPin(LED1_GPIO_Port, LED1_Pin);
 #define LED1_TOGGLE() LL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-#define LED2_ON() LL_GPIO_SetOutputPin(LED2_GPIO_Port, LED2_Pin);
-#define LED2_OFF() LL_GPIO_ResetOutputPin(LED2_GPIO_Port, LED2_Pin);
+#define LED2_ON()     LL_GPIO_SetOutputPin(LED2_GPIO_Port, LED2_Pin);
+#define LED2_OFF()    LL_GPIO_ResetOutputPin(LED2_GPIO_Port, LED2_Pin);
 #define LED2_TOGGLE() LL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+
+#define USB_PIN_DISCONNECT() LL_GPIO_SetOutputPin(USB_DISCONNECT_GPIO_Port, USB_DISCONNECT_Pin);
+#define USB_PIN_CONNECT()    LL_GPIO_ResetOutputPin(USB_DISCONNECT_GPIO_Port, USB_DISCONNECT_Pin);
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
@@ -87,8 +90,8 @@ void Error_Handler(void);
 #define E32_M0_GPIO_Port GPIOA
 #define E32_M1_Pin LL_GPIO_PIN_1
 #define E32_M1_GPIO_Port GPIOA
-#define USB_DSCNT_Pin LL_GPIO_PIN_4
-#define USB_DSCNT_GPIO_Port GPIOA
+#define USB_DISCONNECT_Pin LL_GPIO_PIN_4
+#define USB_DISCONNECT_GPIO_Port GPIOA
 #define FLASH_SPI1_SCK_Pin LL_GPIO_PIN_5
 #define FLASH_SPI1_SCK_GPIO_Port GPIOA
 #define FLASH_SPI1_MISO_Pin LL_GPIO_PIN_6

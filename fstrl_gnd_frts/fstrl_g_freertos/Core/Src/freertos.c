@@ -25,7 +25,7 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+/* USER CODE BEGIN Includes */     
 
 /* USER CODE END Includes */
 
@@ -48,8 +48,10 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-osThreadId defaultTaskHandle;
-osThreadId tskSpiNand_wrkrHandle;
+osThreadId tsk_PERIF_ResetHandle;
+uint32_t tsk_PERIF_ResetBuffer[ 512 ];
+osStaticThreadDef_t tsk_PERIF_ResetControlBlock;
+osThreadId tsk_SPINand_wrkHandle;
 uint32_t tskSpiNand_wrkrBuffer[ 1024 ];
 osStaticThreadDef_t tskSpiNand_wrkrControlBlock;
 osThreadId tsk_LED1_blinkHandle;
@@ -61,6 +63,7 @@ osStaticThreadDef_t tsk_LED2_blinkControlBlock;
 osMessageQId msgto_SpiNand_wrkrHandle;
 uint8_t msgto_SpiNand_wrkrBuffer[ 16 * sizeof( uint8_t ) ];
 osStaticMessageQDef_t msgto_SpiNand_wrkrControlBlock;
+osMessageQId msgto_LED_wrkrHandle;
 osTimerId tmTestTimerHandle;
 osStaticTimerDef_t tmTestTimerControlBlock;
 osMutexId mt_SPI1_freeHandle;
@@ -83,12 +86,13 @@ osStaticSemaphoreDef_t sm_LCD_Bus_readyControlBlock;
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(const void * argument);
-extern void Start_SpiNand_wrkr(const void * argument);
-extern void Start_tsk_LEDx_blink(const void * argument);
-extern void StartDefaultTask(const void * argument);
-void tmTestTimer_clbck(const void * argument);
+void vReset_Perifery_Device(void const * argument);
+extern void vStart_SpiNand_wrkr(void const * argument);
+extern void Start_tsk_LEDx_blink(void const * argument);
+void tmTestTimer_clbck(void const * argument);
 
+extern void MX_USB_DEVICE_Init(void);
+extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* GetIdleTaskMemory prototype (linked to static allocation support) */
@@ -220,18 +224,22 @@ void MX_FREERTOS_Init(void) {
   osMessageQStaticDef(msgto_SpiNand_wrkr, 16, uint8_t, msgto_SpiNand_wrkrBuffer, &msgto_SpiNand_wrkrControlBlock);
   msgto_SpiNand_wrkrHandle = osMessageCreate(osMessageQ(msgto_SpiNand_wrkr), NULL);
 
+  /* definition and creation of msgto_LED_wrkr */
+  osMessageQDef(msgto_LED_wrkr, 16, uint16_t);
+  msgto_LED_wrkrHandle = osMessageCreate(osMessageQ(msgto_LED_wrkr), NULL);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 256);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+  /* definition and creation of tsk_PERIF_Reset */
+  osThreadStaticDef(tsk_PERIF_Reset, vReset_Perifery_Device, osPriorityAboveNormal, 0, 512, tsk_PERIF_ResetBuffer, &tsk_PERIF_ResetControlBlock);
+  tsk_PERIF_ResetHandle = osThreadCreate(osThread(tsk_PERIF_Reset), NULL);
 
-  /* definition and creation of tskSpiNand_wrkr */
-  osThreadStaticDef(tskSpiNand_wrkr, Start_SpiNand_wrkr, osPriorityNormal, 0, 1024, tskSpiNand_wrkrBuffer, &tskSpiNand_wrkrControlBlock);
-  tskSpiNand_wrkrHandle = osThreadCreate(osThread(tskSpiNand_wrkr), NULL);
+  /* definition and creation of tsk_SPINand_wrk */
+  osThreadStaticDef(tsk_SPINand_wrk, vStart_SpiNand_wrkr, osPriorityNormal, 0, 1024, tskSpiNand_wrkrBuffer, &tskSpiNand_wrkrControlBlock);
+  tsk_SPINand_wrkHandle = osThreadCreate(osThread(tsk_SPINand_wrk), NULL);
 
   /* definition and creation of tsk_LED1_blink */
   osThreadStaticDef(tsk_LED1_blink, Start_tsk_LEDx_blink, osPriorityNormal, 0, 256, tsk_LED1_blinkBuffer, &tsk_LED1_blinkControlBlock);
@@ -248,8 +256,32 @@ void MX_FREERTOS_Init(void) {
 
 }
 
+/* USER CODE BEGIN Header_vReset_Perifery_Device */
+/**
+  * @brief  Function implementing the tsk_PERIF_Reset thread.
+  * @param  argument: Not used 
+  * @retval None
+  */
+/* USER CODE END Header_vReset_Perifery_Device */
+__weak void vReset_Perifery_Device(void const * argument)
+{
+  /* init code for USB_DEVICE */
+  MX_USB_DEVICE_Init();
+
+  /* init code for FATFS */
+  MX_FATFS_Init();
+
+  /* USER CODE BEGIN vReset_Perifery_Device */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END vReset_Perifery_Device */
+}
+
 /* tmTestTimer_clbck function */
-void tmTestTimer_clbck(const void * argument)
+void tmTestTimer_clbck(void const * argument)
 {
   /* USER CODE BEGIN tmTestTimer_clbck */
 

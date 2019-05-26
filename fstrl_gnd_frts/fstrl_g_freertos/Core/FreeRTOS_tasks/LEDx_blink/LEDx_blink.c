@@ -36,7 +36,7 @@ uint8_t *arg = (uint8_t*)argument;
           LCD1602A_ClearScreen(); //Очистка дисплея от мусора
           LCD1602A_SetCursorPos(0, 1); //Установка курсора
           LCD1602A_PrintStr("LED1Task_enter" + '\0');
-          } osSemaphoreRelease(mt_LCD_freeHandle);
+          osSemaphoreRelease(mt_LCD_freeHandle);}
           //uint8_t flag1 = 1;
           LED1_TOGGLE();
           //flag1 = 0;
@@ -45,7 +45,7 @@ uint8_t *arg = (uint8_t*)argument;
           LCD1602A_ClearScreen(); //Очистка дисплея от мусора
           LCD1602A_SetCursorPos(0, 1); //Установка курсора
           LCD1602A_PrintStr("LED1Task_exit" + '\0');
-          } osSemaphoreRelease(mt_LCD_freeHandle);
+          osSemaphoreRelease(mt_LCD_freeHandle);}
           //taskYIELD();
           } else
                 {
@@ -53,7 +53,7 @@ uint8_t *arg = (uint8_t*)argument;
                                LCD1602A_ClearScreen(); //Очистка дисплея от мусора
                                LCD1602A_SetCursorPos(1, 1); //Установка курсора
                                LCD1602A_PrintStr("LED2Task_enter" + '\0');
-                               } osSemaphoreRelease(mt_LCD_freeHandle);
+                               osSemaphoreRelease(mt_LCD_freeHandle);}
                  //uint8_t flag2 = 1;
                  LED2_TOGGLE();
                  //flag2 = 0;
@@ -62,7 +62,7 @@ uint8_t *arg = (uint8_t*)argument;
                  LCD1602A_ClearScreen(); //Очистка дисплея от мусора
                  LCD1602A_SetCursorPos(1, 1); //Установка курсора
                  LCD1602A_PrintStr("LED2Task_exit" + '\0');
-                 } osSemaphoreRelease(mt_LCD_freeHandle);
+                 osSemaphoreRelease(mt_LCD_freeHandle);}
                 // taskYIELD();
                 }
   }

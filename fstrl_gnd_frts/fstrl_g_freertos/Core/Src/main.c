@@ -113,6 +113,8 @@ int main(void)
   MX_TIM7_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
+  USB_PIN_DISCONNECT()
+
 
   /* USER CODE END 2 */
 

@@ -30,9 +30,9 @@
 
 /* USER CODE END 1 */
 
-/** Configure pins as 
-        * Analog 
-        * Input 
+/** Configure pins as
+        * Analog
+        * Input
         * Output
         * EVENT_OUT
         * EXTI
@@ -56,11 +56,11 @@ void MX_GPIO_Init(void)
   LL_GPIO_ResetOutputPin(GPIOC, NRF24_PWR_EN_Pin|NRF24_CSN_Pin);
 
   /**/
-  LL_GPIO_ResetOutputPin(GPIOB, E32_PWR_EN_Pin|LED2_Pin|LCD_D4_Pin|LCD_D5_Pin 
+  LL_GPIO_ResetOutputPin(GPIOB, E32_PWR_EN_Pin|LED2_Pin|LCD_D4_Pin|LCD_D5_Pin
                           |LCD_D6_Pin|LCD_D7_Pin|LCD_E_Pin|LCD_RS_Pin);
 
   /**/
-  LL_GPIO_SetOutputPin(USB_DSCNT_GPIO_Port, USB_DSCNT_Pin);
+  LL_GPIO_SetOutputPin(USB_DISCONNECT_GPIO_Port, USB_DISCONNECT_Pin);
 
   /**/
   LL_GPIO_SetOutputPin(GPIOC, FLASH_CSN_Pin|NRF24_CE_Pin);
@@ -102,25 +102,25 @@ void MX_GPIO_Init(void)
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /**/
-  GPIO_InitStruct.Pin = USB_DSCNT_Pin;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_MEDIUM;
-  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  LL_GPIO_Init(USB_DSCNT_GPIO_Port, &GPIO_InitStruct);
-
-  /**/
-  GPIO_InitStruct.Pin = FLASH_CSN_Pin|NRF24_CE_Pin|NRF24_CSN_Pin;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /**/
-  GPIO_InitStruct.Pin = NRF24_PWR_EN_Pin;
+  GPIO_InitStruct.Pin = USB_DISCONNECT_Pin;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  LL_GPIO_Init(NRF24_PWR_EN_GPIO_Port, &GPIO_InitStruct);
+  LL_GPIO_Init(USB_DISCONNECT_GPIO_Port, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = FLASH_CSN_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  LL_GPIO_Init(FLASH_CSN_GPIO_Port, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = NRF24_PWR_EN_Pin|NRF24_CE_Pin|NRF24_CSN_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_MEDIUM;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /**/
   GPIO_InitStruct.Pin = E32_PWR_EN_Pin|LED1_Pin|LED2_Pin;
@@ -143,7 +143,7 @@ void MX_GPIO_Init(void)
   LL_GPIO_Init(LCD_RW_GPIO_Port, &GPIO_InitStruct);
 
   /**/
-  GPIO_InitStruct.Pin = LCD_D4_Pin|LCD_D5_Pin|LCD_D6_Pin|LCD_D7_Pin 
+  GPIO_InitStruct.Pin = LCD_D4_Pin|LCD_D5_Pin|LCD_D6_Pin|LCD_D7_Pin
                           |LCD_E_Pin|LCD_RS_Pin;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;

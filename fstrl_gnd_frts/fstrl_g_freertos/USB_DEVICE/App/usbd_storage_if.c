@@ -23,8 +23,8 @@
 #include "usbd_storage_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-#include "stm32f1xx_hal_sd.h"
-
+#include "diskio.h"
+#include "sd_diskio.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -116,7 +116,7 @@ const int8_t STORAGE_Inquirydata_FS[] = {/* 36 */
 /* USER CODE END INQUIRY_DATA_FS */
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
-extern SD_HandleTypeDef hsd;
+//extern SD_HandleTypeDef hsd;
 extern HAL_SD_CardInfoTypeDef SDCardInfo;
 
 /* USER CODE END PRIVATE_VARIABLES */
@@ -181,9 +181,12 @@ USBD_StorageTypeDef USBD_Storage_Interface_fops_FS =
   */
 int8_t STORAGE_Init_FS(uint8_t lun)
 {
+
   /* USER CODE BEGIN 2 */
-  HAL_SD_Init(&hsd);
-  return (USBD_OK);
+if (SD_Driver.disk_status(lun) == STA_NOINIT) {
+    if (SD_Driver.disk_initialize(lun) != 0) {return USBD_FAIL;}
+    }
+ return (USBD_OK);
   /* USER CODE END 2 */
 }
 
@@ -197,10 +200,15 @@ int8_t STORAGE_Init_FS(uint8_t lun)
 int8_t STORAGE_GetCapacity_FS(uint8_t lun, uint32_t *block_num, uint16_t *block_size)
 {
   /* USER CODE BEGIN 3 */
+uint32_t sect_cnt = {0};
+uint32_t sect_sz  = {0};
+uint8_t res = 0;
 
-  HAL_SD_GetCardInfo(&hsd, &SDCardInfo);
-  *block_num  = SDCardInfo.BlockNbr; //STORAGE_BLK_NBR;
-  *block_size = STORAGE_BLK_SIZ;
+res |= SD_Driver.disk_ioctl(lun, GET_SECTOR_COUNT, &sect_cnt );
+res |= SD_Driver.disk_ioctl(lun, GET_SECTOR_SIZE, &sect_sz);
+if (res != 0) {return (USBD_FAIL);}
+*block_num  = sect_cnt; //STORAGE_BLK_NBR;
+  *block_size = sect_sz;
   return (USBD_OK);
   /* USER CODE END 3 */
 }
@@ -213,7 +221,8 @@ int8_t STORAGE_GetCapacity_FS(uint8_t lun, uint32_t *block_num, uint16_t *block_
 int8_t STORAGE_IsReady_FS(uint8_t lun)
 {
   /* USER CODE BEGIN 4 */
-  if (HAL_SD_GetCardState(&hsd) == HAL_SD_CARD_READY) {return (USBD_OK);}
+  //if (BSP_SD_IsDetected() != SD_PRESENT) {return USBD_FAIL;}
+  if (SD_Driver.disk_status(lun) == STA_NOINIT) {return (USBD_FAIL);}
   return (USBD_OK);
   /* USER CODE END 4 */
 }
@@ -238,8 +247,9 @@ int8_t STORAGE_IsWriteProtected_FS(uint8_t lun)
 int8_t STORAGE_Read_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
   /* USER CODE BEGIN 6 */
-HAL_SD_ReadBlocks(&hsd, buf, blk_addr, (uint32_t) blk_len, 10);
-return (USBD_OK);
+
+return SD_Driver.disk_read(lun, buf, blk_addr, blk_len);
+
   /* USER CODE END 6 */
 }
 
@@ -251,8 +261,9 @@ return (USBD_OK);
 int8_t STORAGE_Write_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
   /* USER CODE BEGIN 7 */
-  HAL_SD_WriteBlocks(&hsd, buf, blk_addr, (uint32_t) blk_len, 10);
-  return (USBD_OK);
+
+return SD_Driver.disk_write(lun, buf, blk_addr, blk_len);
+
   /* USER CODE END 7 */
 }
 
@@ -264,7 +275,8 @@ int8_t STORAGE_Write_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t b
 int8_t STORAGE_GetMaxLun_FS(void)
 {
   /* USER CODE BEGIN 8 */
-  return (STORAGE_LUN_NBR - 1);
+ int8_t res = STORAGE_LUN_NBR - 1;
+  return res;
   /* USER CODE END 8 */
 }
 

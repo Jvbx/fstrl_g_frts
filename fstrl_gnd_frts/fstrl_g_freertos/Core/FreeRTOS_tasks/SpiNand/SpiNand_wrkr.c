@@ -23,7 +23,7 @@
 * @retval None
 */
 /* Header_Start_SpiNand_wrkr */
-void Start_SpiNand_wrkr(const void * argument)
+void vStart_SpiNand_wrkr(const void * argument)
 {
 
 
