@@ -64,6 +64,9 @@ osMessageQId msgto_SpiNand_wrkrHandle;
 uint8_t msgto_SpiNand_wrkrBuffer[ 16 * sizeof( uint8_t ) ];
 osStaticMessageQDef_t msgto_SpiNand_wrkrControlBlock;
 osMessageQId msgto_LED_wrkrHandle;
+osMessageQId msgto_LCD_wrkrHandle;
+uint8_t msgto_LCD_wrkrBuffer[ 16 * sizeof( uint16_t ) ];
+osStaticMessageQDef_t msgto_LCD_wrkrControlBlock;
 osTimerId tmTestTimerHandle;
 osStaticTimerDef_t tmTestTimerControlBlock;
 osMutexId mt_SPI1_freeHandle;
@@ -227,6 +230,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of msgto_LED_wrkr */
   osMessageQDef(msgto_LED_wrkr, 16, uint16_t);
   msgto_LED_wrkrHandle = osMessageCreate(osMessageQ(msgto_LED_wrkr), NULL);
+
+  /* definition and creation of msgto_LCD_wrkr */
+  osMessageQStaticDef(msgto_LCD_wrkr, 16, uint16_t, msgto_LCD_wrkrBuffer, &msgto_LCD_wrkrControlBlock);
+  msgto_LCD_wrkrHandle = osMessageCreate(osMessageQ(msgto_LCD_wrkr), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */

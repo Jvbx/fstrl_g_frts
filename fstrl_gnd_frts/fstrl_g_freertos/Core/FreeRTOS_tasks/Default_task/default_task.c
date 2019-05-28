@@ -32,7 +32,7 @@ void vReset_Perifery_Device(const void * argument)
   osThreadSuspendAll();
 
   /* init code for FATFS */
-  MX_FATFS_Init();
+  //MX_FATFS_Init();
 
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();

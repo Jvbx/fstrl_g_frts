@@ -82,7 +82,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 //tt
   /* USER CODE END 1 */
-
+  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -123,7 +123,7 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
-
+  
   /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
@@ -147,14 +147,14 @@ void SystemClock_Config(void)
 
    if(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_2)
   {
-    Error_Handler();
+    Error_Handler();  
   }
   LL_RCC_HSE_Enable();
 
    /* Wait till HSE is ready */
   while(LL_RCC_HSE_IsReady() != 1)
   {
-
+    
   }
   LL_PWR_EnableBkUpAccess();
   LL_RCC_ForceBackupDomainReset();
@@ -164,7 +164,7 @@ void SystemClock_Config(void)
    /* Wait till LSE is ready */
   while(LL_RCC_LSE_IsReady() != 1)
   {
-
+    
   }
   LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSE);
   LL_RCC_EnableRTC();
@@ -175,7 +175,7 @@ void SystemClock_Config(void)
    /* Wait till PLL is ready */
   while(LL_RCC_PLL_IsReady() != 1)
   {
-
+    
   }
   LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
   LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_2);
@@ -185,7 +185,7 @@ void SystemClock_Config(void)
    /* Wait till System clock is ready */
   while(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL)
   {
-
+  
   }
   LL_Init1msTick(72000000);
   LL_SYSTICK_SetClkSource(LL_SYSTICK_CLKSOURCE_HCLK);
@@ -239,7 +239,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{
+{ 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
