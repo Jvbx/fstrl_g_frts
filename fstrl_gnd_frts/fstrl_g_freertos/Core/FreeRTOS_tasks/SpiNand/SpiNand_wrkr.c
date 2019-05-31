@@ -30,6 +30,8 @@ void vStart_SpiNand_wrkr(const void * argument)
   /* Infinite loop */
   for(;;)
   {
+      taskYIELD();
+      osDelay(1);
   }
 
 }

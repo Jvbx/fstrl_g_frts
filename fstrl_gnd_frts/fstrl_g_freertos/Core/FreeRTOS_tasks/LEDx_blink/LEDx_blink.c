@@ -15,14 +15,14 @@
 
 extern osMutexId mt_LCD_freeHandle;
 
-/* Header_Start_tsk_LEDx_blink */
+/* Header_vStart_tsk_LEDx_blink */
 /**
 * @brief Function implementing the tsk_LED1_blink thread.
 * @param argument: Not used
 * @retval None
 */
-/* Header_Start_tsk_LEDx_blink */
-void Start_tsk_LEDx_blink(const void * argument)
+/* Header_vStart_tsk_LEDx_blink */
+void vStart_tsk_LEDx_blink(const void * argument)
 {
 
 uint8_t *arg = (uint8_t*)argument;
@@ -46,7 +46,7 @@ uint8_t *arg = (uint8_t*)argument;
           LCD1602A_SetCursorPos(0, 1); //Установка курсора
           LCD1602A_PrintStr("LED1Task_exit" + '\0');
           osSemaphoreRelease(mt_LCD_freeHandle);}
-          //taskYIELD();
+          taskYIELD();
           } else
                 {
               if(osSemaphoreWait(mt_LCD_freeHandle, 0) == osOK) {
@@ -63,7 +63,7 @@ uint8_t *arg = (uint8_t*)argument;
                  LCD1602A_SetCursorPos(1, 1); //Установка курсора
                  LCD1602A_PrintStr("LED2Task_exit" + '\0');
                  osSemaphoreRelease(mt_LCD_freeHandle);}
-                // taskYIELD();
+                taskYIELD();
                 }
   }
 

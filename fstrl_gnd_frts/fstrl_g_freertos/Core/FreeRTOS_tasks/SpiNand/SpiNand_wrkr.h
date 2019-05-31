@@ -1,13 +1,13 @@
 /*
- * LEDx_blink.h
+ * SpiNand_wrkr.h
  *
  *  Created on: May 19, 2019
  *      Author: jvbx0
  */
 
-#ifndef FREERTOS_TASKS_LEDX_BLINK_LEDX_BLINK_H_
-#define FREERTOS_TASKS_LEDX_BLINK_LEDX_BLINK_H_
+#ifndef __SPINAND_WRKR_H_
+#define __SPINAND_WRKR_H_
 
 
 
-#endif /* FREERTOS_TASKS_LEDX_BLINK_LEDX_BLINK_H_ */
+#endif /* __SPINAND_WRKR_H_ */

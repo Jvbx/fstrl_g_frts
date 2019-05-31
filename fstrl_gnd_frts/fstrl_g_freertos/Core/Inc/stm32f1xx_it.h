@@ -64,11 +64,11 @@ void DMA1_Channel7_IRQHandler(void);
 void USB_LP_CAN1_RX0_IRQHandler(void);
 void USART1_IRQHandler(void);
 void USART2_IRQHandler(void);
-void USBWakeUp_IRQHandler(void);
 void SDIO_IRQHandler(void);
 void TIM6_IRQHandler(void);
 void TIM7_IRQHandler(void);
 void DMA2_Channel1_IRQHandler(void);
+void DMA2_Channel4_5_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

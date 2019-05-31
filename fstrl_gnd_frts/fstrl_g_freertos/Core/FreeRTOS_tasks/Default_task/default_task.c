@@ -20,22 +20,22 @@
 extern gd5f       spi_nand_gd5f;
 
 
-/* USER CODE BEGIN Header_vReset_Perifery_Device */
+/* USER CODE BEGIN Header_vStart_tsk_INIT_Periph */
 /**
   * @brief  Function implementing the tsk_PERIF_Reset thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_vReset_Perifery_Device */
-void vReset_Perifery_Device(const void * argument)
+/* USER CODE END Header_vStart_tsk_INIT_Periph */
+void vStart_tsk_INIT_Periph(const void * argument)
 {
   osThreadSuspendAll();
 
-  /* init code for FATFS */
-  //MX_FATFS_Init();
-
-  /* init code for USB_DEVICE */
+/* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
+
+  /* init code for FATFS */
+  MX_FATFS_Init();
   USB_PIN_CONNECT()
 
 
@@ -108,16 +108,17 @@ lfs_file_t file;
          LCD1602A_SetCursorPos(1, 0);
          for (uint8_t i = 0; i < 16; i++) {
              LCD1602A_PrintStr("*");
-             LL_mDelay(50);
+             LL_mDelay(20);
          }
 
 
          osThreadResumeAll();
 
+
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osThreadTerminate(NULL);
   }
   /* USER CODE END StartDefaultTask */
 }

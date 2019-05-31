@@ -48,25 +48,27 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-osThreadId tsk_PERIF_ResetHandle;
-uint32_t tsk_PERIF_ResetBuffer[ 512 ];
-osStaticThreadDef_t tsk_PERIF_ResetControlBlock;
-osThreadId tsk_SPINand_wrkHandle;
-uint32_t tskSpiNand_wrkrBuffer[ 1024 ];
-osStaticThreadDef_t tskSpiNand_wrkrControlBlock;
+osThreadId tsk_INIT_PeriphHandle;
+uint32_t tsk_INIT_PeriphBuffer[ 256 ];
+osStaticThreadDef_t tsk_INIT_PeriphControlBlock;
+osThreadId tsk_SPINand_ioHandle;
+uint32_t tsk_SPINand_ioBuffer[ 1024 ];
+osStaticThreadDef_t tsk_SPINand_ioControlBlock;
 osThreadId tsk_LED1_blinkHandle;
 uint32_t tsk_LED1_blinkBuffer[ 256 ];
 osStaticThreadDef_t tsk_LED1_blinkControlBlock;
 osThreadId tsk_LED2_blinkHandle;
 uint32_t tsk_LED2_blinkBuffer[ 256 ];
 osStaticThreadDef_t tsk_LED2_blinkControlBlock;
-osMessageQId msgto_SpiNand_wrkrHandle;
+osThreadId gkt_LCDHandle;
+uint32_t gkt_LCDBuffer[ 256 ];
+osStaticThreadDef_t gkt_LCDControlBlock;
+osMessageQId msgto_tsk_SpiNand_ioHandle;
 uint8_t msgto_SpiNand_wrkrBuffer[ 16 * sizeof( uint8_t ) ];
 osStaticMessageQDef_t msgto_SpiNand_wrkrControlBlock;
-osMessageQId msgto_LED_wrkrHandle;
-osMessageQId msgto_LCD_wrkrHandle;
-uint8_t msgto_LCD_wrkrBuffer[ 16 * sizeof( uint16_t ) ];
-osStaticMessageQDef_t msgto_LCD_wrkrControlBlock;
+osMessageQId msgto_gkt_LCDHandle;
+uint8_t msgto_gkt_LCDBuffer[ 16 * sizeof( uint16_t ) ];
+osStaticMessageQDef_t msgto_gkt_LCDControlBlock;
 osTimerId tmTestTimerHandle;
 osStaticTimerDef_t tmTestTimerControlBlock;
 osMutexId mt_SPI1_freeHandle;
@@ -81,17 +83,16 @@ osMutexId mt_UART2_freeHandle;
 osStaticMutexDef_t mt_UART2_freeControlBlock;
 osMutexId mt_NAND_FLASHHandle;
 osStaticMutexDef_t mt_NAND_FLASHControlBlock;
-osSemaphoreId sm_LCD_Bus_readyHandle;
-osStaticSemaphoreDef_t sm_LCD_Bus_readyControlBlock;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
 
-void vReset_Perifery_Device(void const * argument);
-extern void vStart_SpiNand_wrkr(void const * argument);
-extern void Start_tsk_LEDx_blink(void const * argument);
+void vStart_tsk_INIT_Periph(void const * argument);
+void vStart_tsk_SPINand_io(void const * argument);
+void vStart_tsk_LEDx_blink(void const * argument);
+void vStart_gkt_LCD(void const * argument);
 void tmTestTimer_clbck(void const * argument);
 
 extern void MX_USB_DEVICE_Init(void);
@@ -203,11 +204,6 @@ void MX_FREERTOS_Init(void) {
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
-  /* Create the semaphores(s) */
-  /* definition and creation of sm_LCD_Bus_ready */
-  osSemaphoreStaticDef(sm_LCD_Bus_ready, &sm_LCD_Bus_readyControlBlock);
-  sm_LCD_Bus_readyHandle = osSemaphoreCreate(osSemaphore(sm_LCD_Bus_ready), 1);
-
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
 
@@ -223,38 +219,38 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the queue(s) */
-  /* definition and creation of msgto_SpiNand_wrkr */
-  osMessageQStaticDef(msgto_SpiNand_wrkr, 16, uint8_t, msgto_SpiNand_wrkrBuffer, &msgto_SpiNand_wrkrControlBlock);
-  msgto_SpiNand_wrkrHandle = osMessageCreate(osMessageQ(msgto_SpiNand_wrkr), NULL);
+  /* definition and creation of msgto_tsk_SpiNand_io */
+  osMessageQStaticDef(msgto_tsk_SpiNand_io, 16, uint8_t, msgto_SpiNand_wrkrBuffer, &msgto_SpiNand_wrkrControlBlock);
+  msgto_tsk_SpiNand_ioHandle = osMessageCreate(osMessageQ(msgto_tsk_SpiNand_io), NULL);
 
-  /* definition and creation of msgto_LED_wrkr */
-  osMessageQDef(msgto_LED_wrkr, 16, uint16_t);
-  msgto_LED_wrkrHandle = osMessageCreate(osMessageQ(msgto_LED_wrkr), NULL);
-
-  /* definition and creation of msgto_LCD_wrkr */
-  osMessageQStaticDef(msgto_LCD_wrkr, 16, uint16_t, msgto_LCD_wrkrBuffer, &msgto_LCD_wrkrControlBlock);
-  msgto_LCD_wrkrHandle = osMessageCreate(osMessageQ(msgto_LCD_wrkr), NULL);
+  /* definition and creation of msgto_gkt_LCD */
+  osMessageQStaticDef(msgto_gkt_LCD, 16, uint16_t, msgto_gkt_LCDBuffer, &msgto_gkt_LCDControlBlock);
+  msgto_gkt_LCDHandle = osMessageCreate(osMessageQ(msgto_gkt_LCD), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of tsk_PERIF_Reset */
-  osThreadStaticDef(tsk_PERIF_Reset, vReset_Perifery_Device, osPriorityAboveNormal, 0, 512, tsk_PERIF_ResetBuffer, &tsk_PERIF_ResetControlBlock);
-  tsk_PERIF_ResetHandle = osThreadCreate(osThread(tsk_PERIF_Reset), NULL);
+  /* definition and creation of tsk_INIT_Periph */
+  osThreadStaticDef(tsk_INIT_Periph, vStart_tsk_INIT_Periph, osPriorityAboveNormal, 0, 256, tsk_INIT_PeriphBuffer, &tsk_INIT_PeriphControlBlock);
+  tsk_INIT_PeriphHandle = osThreadCreate(osThread(tsk_INIT_Periph), NULL);
 
-  /* definition and creation of tsk_SPINand_wrk */
-  osThreadStaticDef(tsk_SPINand_wrk, vStart_SpiNand_wrkr, osPriorityNormal, 0, 1024, tskSpiNand_wrkrBuffer, &tskSpiNand_wrkrControlBlock);
-  tsk_SPINand_wrkHandle = osThreadCreate(osThread(tsk_SPINand_wrk), NULL);
+  /* definition and creation of tsk_SPINand_io */
+  osThreadStaticDef(tsk_SPINand_io, vStart_tsk_SPINand_io, osPriorityNormal, 0, 1024, tsk_SPINand_ioBuffer, &tsk_SPINand_ioControlBlock);
+  tsk_SPINand_ioHandle = osThreadCreate(osThread(tsk_SPINand_io), NULL);
 
   /* definition and creation of tsk_LED1_blink */
-  osThreadStaticDef(tsk_LED1_blink, Start_tsk_LEDx_blink, osPriorityNormal, 0, 256, tsk_LED1_blinkBuffer, &tsk_LED1_blinkControlBlock);
+  osThreadStaticDef(tsk_LED1_blink, vStart_tsk_LEDx_blink, osPriorityNormal, 0, 256, tsk_LED1_blinkBuffer, &tsk_LED1_blinkControlBlock);
   tsk_LED1_blinkHandle = osThreadCreate(osThread(tsk_LED1_blink), NULL);
 
   /* definition and creation of tsk_LED2_blink */
-  osThreadStaticDef(tsk_LED2_blink, Start_tsk_LEDx_blink, osPriorityNormal, 0, 256, tsk_LED2_blinkBuffer, &tsk_LED2_blinkControlBlock);
+  osThreadStaticDef(tsk_LED2_blink, vStart_tsk_LEDx_blink, osPriorityNormal, 0, 256, tsk_LED2_blinkBuffer, &tsk_LED2_blinkControlBlock);
   tsk_LED2_blinkHandle = osThreadCreate(osThread(tsk_LED2_blink), (void*) 1);
+
+  /* definition and creation of gkt_LCD */
+  osThreadStaticDef(gkt_LCD, vStart_gkt_LCD, osPriorityNormal, 0, 256, gkt_LCDBuffer, &gkt_LCDControlBlock);
+  gkt_LCDHandle = osThreadCreate(osThread(gkt_LCD), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -263,14 +259,14 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_vReset_Perifery_Device */
+/* USER CODE BEGIN Header_vStart_tsk_INIT_Periph */
 /**
-  * @brief  Function implementing the tsk_PERIF_Reset thread.
+  * @brief  Function implementing the tsk_INIT_Periph thread.
   * @param  argument: Not used 
   * @retval None
   */
-/* USER CODE END Header_vReset_Perifery_Device */
-__weak void vReset_Perifery_Device(void const * argument)
+/* USER CODE END Header_vStart_tsk_INIT_Periph */
+__weak void vStart_tsk_INIT_Periph(void const * argument)
 {
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
@@ -278,13 +274,67 @@ __weak void vReset_Perifery_Device(void const * argument)
   /* init code for FATFS */
   MX_FATFS_Init();
 
-  /* USER CODE BEGIN vReset_Perifery_Device */
+  /* USER CODE BEGIN vStart_tsk_INIT_Periph */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END vReset_Perifery_Device */
+  /* USER CODE END vStart_tsk_INIT_Periph */
+}
+
+/* USER CODE BEGIN Header_vStart_tsk_SPINand_io */
+/**
+* @brief Function implementing the tsk_SPINand_io thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_vStart_tsk_SPINand_io */
+__weak void vStart_tsk_SPINand_io(void const * argument)
+{
+  /* USER CODE BEGIN vStart_tsk_SPINand_io */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END vStart_tsk_SPINand_io */
+}
+
+/* USER CODE BEGIN Header_vStart_tsk_LEDx_blink */
+/**
+* @brief Function implementing the tsk_LED1_blink thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_vStart_tsk_LEDx_blink */
+__weak void vStart_tsk_LEDx_blink(void const * argument)
+{
+  /* USER CODE BEGIN vStart_tsk_LEDx_blink */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END vStart_tsk_LEDx_blink */
+}
+
+/* USER CODE BEGIN Header_vStart_gkt_LCD */
+/**
+* @brief Function implementing the gkt_LCD thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_vStart_gkt_LCD */
+__weak void vStart_gkt_LCD(void const * argument)
+{
+  /* USER CODE BEGIN vStart_gkt_LCD */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END vStart_gkt_LCD */
 }
 
 /* tmTestTimer_clbck function */

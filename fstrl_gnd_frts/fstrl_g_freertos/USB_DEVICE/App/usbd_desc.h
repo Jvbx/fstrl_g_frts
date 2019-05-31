@@ -17,10 +17,10 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */  
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBD_DESC__C__
-#define __USBD_DESC__C__
+#ifndef __USBD_DESC__H__
+#define __USBD_DESC__H__
 
 #ifdef __cplusplus
  extern "C" {
@@ -41,7 +41,7 @@
   * @brief Usb device descriptors module.
   * @{
   */
-  
+
 /** @defgroup USBD_DESC_Exported_Constants USBD_DESC_Exported_Constants
   * @brief Constants.
   * @{
@@ -140,6 +140,6 @@ extern USBD_DescriptorsTypeDef FS_Desc;
 }
 #endif
 
-#endif /* __USBD_DESC__C__ */
+#endif /* __USBD_DESC__H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

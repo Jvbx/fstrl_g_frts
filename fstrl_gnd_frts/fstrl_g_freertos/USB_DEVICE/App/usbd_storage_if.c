@@ -23,7 +23,10 @@
 #include "usbd_storage_if.h"
 
 /* USER CODE BEGIN INCLUDE */
+#include "diskio.h"
+#include "ff_gen_drv.h"
 #include "bsp_driver_sd.h"
+#include "usbd_msc_scsi.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,6 +35,8 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+static volatile DSTATUS sd_Stat = STA_NOINIT;
+extern Diskio_drvTypeDef  SD_Driver;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -180,8 +185,11 @@ USBD_StorageTypeDef USBD_Storage_Interface_fops_FS =
 int8_t STORAGE_Init_FS(uint8_t lun)
 {
   /* USER CODE BEGIN 2 */
- BSP_SD_Init();
- return (USBD_OK);
+/* Configure the uSD device */
+sd_Stat = USBD_FAIL;
+sd_Stat = SD_Driver.disk_initialize(lun);
+return sd_Stat;
+
   /* USER CODE END 2 */
 }
 
@@ -195,19 +203,16 @@ int8_t STORAGE_Init_FS(uint8_t lun)
 int8_t STORAGE_GetCapacity_FS(uint8_t lun, uint32_t *block_num, uint16_t *block_size)
 {
   /* USER CODE BEGIN 3 */
-HAL_SD_CardInfoTypeDef info;
 
-  int8_t ret = -1;
+
+  int8_t sd_Stat = -1;
 
   if (BSP_SD_IsDetected() != SD_NOT_PRESENT)
   {
-    BSP_SD_GetCardInfo(&info);
-
-    *block_num = info.LogBlockNbr - 1;
-    *block_size = info.LogBlockSize;
-    ret = 0;
+      sd_Stat = SD_Driver.disk_ioctl(lun, GET_SECTOR_COUNT, block_num);
+      sd_Stat |= SD_Driver.disk_ioctl(lun, GET_SECTOR_SIZE, block_size);
   }
-  return ret;
+  return sd_Stat;
   /* USER CODE END 3 */
 }
 
@@ -219,29 +224,14 @@ HAL_SD_CardInfoTypeDef info;
 int8_t STORAGE_IsReady_FS(uint8_t lun)
 {
   /* USER CODE BEGIN 4 */
-static int8_t prev_status = 0;
-  int8_t ret = -1;
-
+sd_Stat = -1;
 
   if (BSP_SD_IsDetected() != SD_NOT_PRESENT)
   {
-      return 0;
-      if (prev_status < 0)
-    {
-      BSP_SD_Init();
-      prev_status = 0;
+      sd_Stat =   SD_Driver.disk_status(lun);
+  }
 
-    }
-    if (BSP_SD_GetCardState() == SD_TRANSFER_OK)
-    {
-      ret = 0;
-    }
-  }
-  else if (prev_status == 0)
-  {
-    prev_status = -1;
-  }
-  return ret;
+  return sd_Stat;
   /* USER CODE END 4 */
 }
 
@@ -265,14 +255,15 @@ int8_t STORAGE_IsWriteProtected_FS(uint8_t lun)
 int8_t STORAGE_Read_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
   /* USER CODE BEGIN 6 */
-int8_t ret = -1;
+sd_Stat = -1;
 
   if (BSP_SD_IsDetected() != SD_NOT_PRESENT)
   {
-    BSP_SD_ReadBlocks((uint32_t *) buf, blk_addr, blk_len, 1);
-    ret = 0;
+      sd_Stat =  SD_Driver.disk_read(lun, buf,  (uint32_t)blk_addr,  (uint16_t) blk_len);
+      // BSP_SD_ReadBlocks((uint32_t *) buf, blk_addr, blk_len, 1);
+      //ret = BSP_SD_ReadBlocks((uint32_t *) buf, (uint32_t)blk_addr, (uint32_t)blk_len, 1000);
   }
-  return ret;
+  return sd_Stat;
 
   /* USER CODE END 6 */
 }
@@ -286,14 +277,15 @@ int8_t STORAGE_Write_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t b
 {
   /* USER CODE BEGIN 7 */
 
-int8_t ret = -1;
+int8_t sd_Stat = -1;
 
 if (BSP_SD_IsDetected() != SD_NOT_PRESENT)
 {
-  BSP_SD_WriteBlocks((uint32_t *) buf, blk_addr, blk_len, 1);
-  ret = 0;
+ // BSP_SD_WriteBlocks((uint32_t *) buf, (uint32_t)blk_addr,  (uint32_t)blk_len, 1000);
+ // ret = 0;
+    sd_Stat =  SD_Driver.disk_write(lun, buf,  (uint32_t)blk_addr,  (uint16_t) blk_len);
 }
-return ret;
+return sd_Stat;
 
   /* USER CODE END 7 */
 }
