@@ -15,7 +15,7 @@
 #include "LCD_1602A.h"
 #include "usb_device.h"
 #include "fatfs.h"
-
+#include "init_task.h"
 
 extern gd5f       spi_nand_gd5f;
 
@@ -42,10 +42,10 @@ void vStart_tsk_INIT_Periph(const void * argument)
   /* USER CODE BEGIN StartDefaultTask */
   //инициализация функции микросекунных задержек
    DWT_Delay_Init();
+  //инициализация дисплея
+  LCD1602A_Init();
+  LCD1602A_DisplayControl(ON, OFF, OFF);
 
-   //инициализация дисплея
-   LCD1602A_Init();
-   LCD1602A_DisplayControl(ON, OFF, OFF);
 
    //инициализация spi-nand
    gd5f_init(&spi_nand_gd5f);
@@ -108,10 +108,10 @@ lfs_file_t file;
          LCD1602A_SetCursorPos(1, 0);
          for (uint8_t i = 0; i < 16; i++) {
              LCD1602A_PrintStr("*");
-             LL_mDelay(20);
+             LL_mDelay(40);
          }
 
-
+         LCD1602A_ClearScreen();
          osThreadResumeAll();
 
 

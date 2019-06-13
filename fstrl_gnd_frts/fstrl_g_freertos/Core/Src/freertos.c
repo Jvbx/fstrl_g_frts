@@ -25,8 +25,8 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */     
-
+/* USER CODE BEGIN Includes */
+#include "gkt_LCD.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,7 +67,7 @@ osMessageQId msgto_tsk_SpiNand_ioHandle;
 uint8_t msgto_SpiNand_wrkrBuffer[ 16 * sizeof( uint8_t ) ];
 osStaticMessageQDef_t msgto_SpiNand_wrkrControlBlock;
 osMessageQId msgto_gkt_LCDHandle;
-uint8_t msgto_gkt_LCDBuffer[ 16 * sizeof( uint16_t ) ];
+uint8_t msgto_gkt_LCDBuffer[ 16 * sizeof( lcd_msg ) ];
 osStaticMessageQDef_t msgto_gkt_LCDControlBlock;
 osTimerId tmTestTimerHandle;
 osStaticTimerDef_t tmTestTimerControlBlock;
@@ -89,11 +89,11 @@ osStaticMutexDef_t mt_NAND_FLASHControlBlock;
 
 /* USER CODE END FunctionPrototypes */
 
-void vStart_tsk_INIT_Periph(void const * argument);
-void vStart_tsk_SPINand_io(void const * argument);
-void vStart_tsk_LEDx_blink(void const * argument);
-void vStart_gkt_LCD(void const * argument);
-void tmTestTimer_clbck(void const * argument);
+void vStart_tsk_INIT_Periph(const void * argument);
+void vStart_tsk_SPINand_io(const void * argument);
+void vStart_tsk_LEDx_blink(const void * argument);
+void vStart_gkt_LCD(const void * argument);
+void tmTestTimer_clbck(const void * argument);
 
 extern void MX_USB_DEVICE_Init(void);
 extern void MX_FATFS_Init(void);
@@ -224,7 +224,7 @@ void MX_FREERTOS_Init(void) {
   msgto_tsk_SpiNand_ioHandle = osMessageCreate(osMessageQ(msgto_tsk_SpiNand_io), NULL);
 
   /* definition and creation of msgto_gkt_LCD */
-  osMessageQStaticDef(msgto_gkt_LCD, 16, uint16_t, msgto_gkt_LCDBuffer, &msgto_gkt_LCDControlBlock);
+  osMessageQStaticDef(msgto_gkt_LCD, 16, lcd_msg, msgto_gkt_LCDBuffer, &msgto_gkt_LCDControlBlock);
   msgto_gkt_LCDHandle = osMessageCreate(osMessageQ(msgto_gkt_LCD), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -262,11 +262,11 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE BEGIN Header_vStart_tsk_INIT_Periph */
 /**
   * @brief  Function implementing the tsk_INIT_Periph thread.
-  * @param  argument: Not used 
+  * @param  argument: Not used
   * @retval None
   */
 /* USER CODE END Header_vStart_tsk_INIT_Periph */
-__weak void vStart_tsk_INIT_Periph(void const * argument)
+__weak void vStart_tsk_INIT_Periph(const void * argument)
 {
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
@@ -290,7 +290,7 @@ __weak void vStart_tsk_INIT_Periph(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_vStart_tsk_SPINand_io */
-__weak void vStart_tsk_SPINand_io(void const * argument)
+__weak void vStart_tsk_SPINand_io(const void * argument)
 {
   /* USER CODE BEGIN vStart_tsk_SPINand_io */
   /* Infinite loop */
@@ -308,7 +308,7 @@ __weak void vStart_tsk_SPINand_io(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_vStart_tsk_LEDx_blink */
-__weak void vStart_tsk_LEDx_blink(void const * argument)
+__weak void vStart_tsk_LEDx_blink(const void * argument)
 {
   /* USER CODE BEGIN vStart_tsk_LEDx_blink */
   /* Infinite loop */
@@ -326,7 +326,7 @@ __weak void vStart_tsk_LEDx_blink(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_vStart_gkt_LCD */
-__weak void vStart_gkt_LCD(void const * argument)
+__weak void vStart_gkt_LCD(const void * argument)
 {
   /* USER CODE BEGIN vStart_gkt_LCD */
   /* Infinite loop */
@@ -338,7 +338,7 @@ __weak void vStart_gkt_LCD(void const * argument)
 }
 
 /* tmTestTimer_clbck function */
-void tmTestTimer_clbck(void const * argument)
+void tmTestTimer_clbck(const void * argument)
 {
   /* USER CODE BEGIN tmTestTimer_clbck */
 
